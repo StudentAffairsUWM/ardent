@@ -430,9 +430,9 @@ abstract class Ardent extends Model {
 		// for the related models and returns the relationship instance which will
 		// actually be responsible for retrieving and hydrating every relations.
 		$instance = new $related;
-		
+
 		$otherKey = $otherKey ?: $instance->getKeyName();
-		
+
 		$query = $instance->newQuery();
 
 		return new BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
@@ -506,7 +506,7 @@ abstract class Ardent extends Model {
 
         // Make this Capsule instance available globally via static methods
         $db->setAsGlobal();
-        
+
         $db->bootEloquent();
 
         $translator = new Translator($lang);
@@ -615,7 +615,7 @@ abstract class Ardent extends Model {
      * @param Closure $beforeSave
      * @param Closure $afterSave
      * @param bool    $force          Forces saving invalid data.
-     * 
+     *
      * @return bool
      * @see Ardent::save()
      * @see Ardent::forceSave()
@@ -829,14 +829,17 @@ abstract class Ardent extends Model {
      * @return array Rules with exclusions applied
      */
     public function buildUniqueExclusionRules(array $rules = array()) {
-      
+
         if (!count($rules))
           $rules = static::$rules;
 
         foreach ($rules as $field => &$ruleset) {
             // If $ruleset is a pipe-separated string, switch it to array
             $ruleset = (is_string($ruleset))? explode('|', $ruleset) : $ruleset;
-
+            if ($ruleset === false) {
+              $ruleset = [];
+            }
+            
             foreach ($ruleset as &$rule) {
                 if (strpos($rule, 'unique:') === 0) {
                     // Stop splitting at 4 so final param will hold optional where clause
@@ -876,7 +879,7 @@ abstract class Ardent extends Model {
                 }
             }
         }
-        
+
         return $rules;
     }
 
@@ -898,7 +901,7 @@ abstract class Ardent extends Model {
         Closure $afterSave = null
     ) {
         $rules = $this->buildUniqueExclusionRules($rules);
-        
+
         return $this->save($rules, $customMessages, $options, $beforeSave, $afterSave);
     }
 
